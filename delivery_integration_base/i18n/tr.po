@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-22 14:45+0000\n"
-"PO-Revision-Date: 2023-09-22 14:45+0000\n"
+"POT-Creation-Date: 2024-03-15 11:40+0000\n"
+"PO-Revision-Date: 2024-03-15 11:40+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,12 +21,7 @@ msgid "${(object.name or '').replace('/','_')}"
 msgstr ""
 
 #. module: delivery_integration_base
-#: model:mail.template,subject:delivery_integration_base.delivery_mail_template
-msgid "${object.company_id.name|safe} Sevk (Ref ${object.sale_id.client_order_ref or ''} ${object.sale_id.name or '/'})"
-msgstr "Altınkaya Kargo Bilgisi (Ref ${object.sale_id.client_order_ref or ''} ${object.sale_id.name or '/'})"
-
-#. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/stock_picking.py:99
+#: code:addons/delivery_integration_base/models/stock_picking.py:151
 #, python-format
 msgid "%s etiket"
 msgstr ""
@@ -48,8 +43,18 @@ msgstr ""
 
 #. module: delivery_integration_base
 #: model:mail.template,body_html:delivery_integration_base.delivery_mail_template
-msgid "<p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Merhaba,</p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"><br><span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">${object.sale_id.client_order_ref or ''}&nbsp;</span>${object.sale_id.name or ''} referans numaralı siparişiniz kargoya verilmiştir.</p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Teslimat Yöntemi: ${object.carrier_id.display_name or ''}</p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Takip No:&nbsp;<span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">${object.shipping_number or ''}</span><br></p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">${'Takip için: %s' % object.carrier_tracking_url if object.carrier_tracking_url else ''}<br></p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"><br></p><p style=\"margin-right: 0px; margin-left: 0px; font-family: &quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Altınkaya Elektronik Cihaz Kutuları</p>"
-msgstr ""
+msgid "<p></p><p>Hello,</p><p><br><span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">Your order with reference number </span>${object.sale_id.client_order_ref or ''} ${object.sale_id.name or ''} has been shipped.</p><p>Shipping Method: ${object.carrier_id.display_name or ''}</p><p>Tracking Number:&nbsp;<span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">${object.shipping_number or ''}</span><br></p><p>Tracking Link: <a href=\"${object.carrier_tracking_url or ''}\" style=\"color:rgb(77, 119, 143);\">${object.carrier_tracking_url or ''}</a></p><p><br></p><p>ALTINKAYA Enclosure for Electronics</p>\n"
+"% if object.sale_id :\n"
+"<p>You can rate your customer experience via following link.</p><a href=\"${object.sale_id.survey_url}\" style=\"color:rgb(77, 119, 143);background-color:#875A7B; padding:8px 16px 8px 16px; color:#fff; border-radius:5px; font-size:13px\">Rate Your Experience</a>\n"
+"% endif\n"
+"<br>\n"
+"<br>"
+msgstr "<p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"></p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Merhaba,</p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"><br><span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">${object.sale_id.client_order_ref or ''}&nbsp;</span>${object.sale_id.name or ''} referans numaralı siparişiniz kargoya verilmiştir.</p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Teslimat Yöntemi: ${object.carrier_id.display_name or ''}</p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Takip No:&nbsp;<span style=\"font-style: initial; font-variant-ligatures: initial; font-variant-caps: initial; font-weight: initial; text-align: inherit;\">${object.shipping_number or ''}</span><br></p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Takip için: <a href=\"${object.carrier_tracking_url or ''}\" style=\"text-decoration:none;background-color:transparent;color:rgb(77, 119, 143);\">${object.carrier_tracking_url or ''}</a></p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"><br></p><p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Altınkaya Elektronik Cihaz Kutuları</p>\n"
+"% if object.sale_id :\n"
+"<p style=\"margin:0px 0 1rem 0;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Aşağıdaki bağlantıdan müşteri deneyiminizi puanlayabilirsiniz.</p><a href=\"${object.sale_id.survey_url}\" style=\"text-decoration:none;color:rgb(77, 119, 143);background-color:#875A7B; padding:8px 16px 8px 16px; color:#fff; border-radius:5px; font-size:13px\">Deneyimi Puanla</a>\n"
+"% endif\n"
+"<br>\n"
+"<br>"
 
 #. module: delivery_integration_base
 #: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_sale_order_delivery_get_rates
@@ -66,20 +71,25 @@ msgstr "<span class=\"text-muted\" attrs=\"{'invisible': [('variable', '!=', 'de
 "                </span>"
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/delivery_carrier.py:167
-#, python-format
-msgid "<span>SMS notification sent to %s</span><br><span>Message:%s</span>"
-msgstr ""
-
-#. module: delivery_integration_base
 #: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_sale_get_rates_wizard
 msgid "<span>Calculated Sale Deci: </span>"
-msgstr "<span>Hesaplanan Satış Desisi: </span>"
+msgstr "<span>Toplam Nakliye Desi: </span>"
+
+#. module: delivery_integration_base
+#: code:addons/delivery_integration_base/models/delivery_carrier.py:174
+#, python-format
+msgid "<span>SMS notification sent to %s</span><br><span>Message:%s</span>"
+msgstr "<span>SMS Gönderildi %s</span><br><span>Mesaj:%s</span>"
+
+#. module: delivery_integration_base
+#: model:mail.template,subject:delivery_integration_base.delivery_mail_template
+msgid "ALTINKAYA Shipment Information (Ref ${object.sale_id.client_order_ref or ''} ${object.sale_id.name or '/'})"
+msgstr "Altınkaya Kargo Bilgisi (Ref ${object.sale_id.client_order_ref or ''} ${object.sale_id.name or '/'})"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,help:delivery_integration_base.field_delivery_carrier__fuel_surcharge_percentage
 msgid "Additional Price to add after calculation of tables"
-msgstr ""
+msgstr "Tabloların hesaplanmasından sonra ek fiyat"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier__attach_barcode
@@ -103,6 +113,12 @@ msgid "Cancel"
 msgstr "İptal"
 
 #. module: delivery_integration_base
+#: code:addons/delivery_integration_base/models/sale_order_line.py:38
+#, python-format
+msgid "Cannot calculate Deci, Weight or Volume for product %s missing."
+msgstr "%s ürünü için desi hesaplanamıyor. Ağırlığı veya boyut bilgileri eksik."
+
+#. module: delivery_integration_base
 #: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_carrier_picking_withcarrier_out_form
 msgid "Cargo Label"
 msgstr "Kargo Etiketi"
@@ -114,8 +130,8 @@ msgid "Carrier"
 msgstr "Nakliyeci"
 
 #. module: delivery_integration_base
-#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__carrier_currency_id
-#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_currency_id
+#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__shipping_currency_id
+#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__shipping_currency_id
 msgid "Carrier Currency"
 msgstr "Nakliyeci para birimi"
 
@@ -125,11 +141,16 @@ msgid "Carrier Payment Type"
 msgstr "Nakliyeci Ödeme Türü"
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/sale_order.py:72
+#: code:addons/delivery_integration_base/models/sale_order.py:79
 #: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_sale_get_rates_wizard
 #, python-format
 msgid "Carrier Rates"
 msgstr "Kurye Ücretleri"
+
+#. module: delivery_integration_base
+#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__carrier_shipping_cost
+msgid "Carrier Shipping Cost"
+msgstr "Nakliyeci Kargo Fiyatı"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__carrier_total_deci
@@ -137,15 +158,20 @@ msgid "Carrier Total Deci"
 msgstr "Nakliyeci Toplam Desi"
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/sale_order.py:45
+#: code:addons/delivery_integration_base/models/sale_order.py:52
 #, python-format
 msgid "Carrier line is not added to order lines. Please add carrier line to order lines."
 msgstr "Sipariş satırlarında nakliyeci satırı bulunamadı. Lütfen kargo fiyat al butonunu kullanın."
 
 #. module: delivery_integration_base
+#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_shipping_cost
+msgid "Carrier shipping cost"
+msgstr "Nakliyeci kargo fiyatı"
+
+#. module: delivery_integration_base
 #: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_total_deci
 msgid "Carrier total reception Deci"
-msgstr ""
+msgstr "Nakliyeci toplam teslim desi"
 
 #. module: delivery_integration_base
 #: model_terms:ir.actions.act_window,help:delivery_integration_base.action_delivery_region
@@ -245,12 +271,23 @@ msgid "Delivery regions for price calculation"
 msgstr ""
 
 #. module: delivery_integration_base
+#: model:ir.actions.act_window,name:delivery_integration_base.action_stock_picking_dispatched_deliveries
+#: model:ir.ui.menu,name:delivery_integration_base.stock_picking_dispatched_deliveries_menu
+msgid "Dispatched Deliveries"
+msgstr "Çıkan Sevkler"
+
+#. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier_lines__display_name
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_region__display_name
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_send_batch_email__display_name
 #: model:ir.model.fields,field_description:delivery_integration_base.field_sale_get_rates_wizard__display_name
 msgid "Display Name"
 msgstr "Görünüm Adı"
+
+#. module: delivery_integration_base
+#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__picking_total_deci
+msgid "Dynamic Total Deci, calculated based on the move lines."
+msgstr "Dinanmik toplam desi, hareket satırlarına göre hesaplanır."
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier__Emergency_fee_per_kg
@@ -327,7 +364,7 @@ msgstr "Son Güncelleme"
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__mail_sent
 msgid "Mail Sent To Customer"
-msgstr ""
+msgstr "Kargo Maili Gönderildi"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier_lines__try_currency_id
@@ -340,19 +377,19 @@ msgid "Main Price"
 msgstr "Temel Fiyat"
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/delivery_carrier.py:114
+#: code:addons/delivery_integration_base/models/delivery_carrier.py:117
 #, python-format
 msgid "No Reference Sequence defined for this carrier"
 msgstr "Bu nakliyeci için herhangi bir referans sırası tanımlanmadı."
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/stock_picking.py:84
+#: code:addons/delivery_integration_base/models/stock_picking.py:136
 #, python-format
 msgid "No default printer defined for the carrier %s"
 msgstr "Bu nakliyeci için varsayılan yazıcı tanımlanmadı. %s"
 
 #. module: delivery_integration_base
-#: code:addons/delivery_integration_base/models/delivery_carrier.py:266
+#: code:addons/delivery_integration_base/models/delivery_carrier.py:273
 #, python-format
 msgid "No price rule matching this order; delivery cost cannot be computed."
 msgstr ""
@@ -374,6 +411,7 @@ msgstr "Paket Sayısı"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier__payment_type
+#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__delivery_payment_type
 msgid "Payment Type"
 msgstr "Ödeme Türü"
 
@@ -385,9 +423,14 @@ msgid "Picking Delivery State Update"
 msgstr ""
 
 #. module: delivery_integration_base
+#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__picking_total_deci
+msgid "Picking Total Deci"
+msgstr "Hesaplanan Desi"
+
+#. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__picking_total_weight
 msgid "Picking Total Weight"
-msgstr "Sevk Toplam Ağırlığı"
+msgstr "Çıkış Desisi"
 
 #. module: delivery_integration_base
 #: code:addons/delivery_integration_base/wizards/sale_get_rates_wizard.py:84
@@ -451,7 +494,6 @@ msgstr "SMS Servisi"
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_sale_get_rates_wizard__sale_deci
 #: model:ir.model.fields,field_description:delivery_integration_base.field_sale_order__sale_deci
-#: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_sale_get_rates_wizard
 msgid "Sale Deci"
 msgstr "Satış Desisi"
 
@@ -466,6 +508,16 @@ msgstr "Satış Teslimat Fiyatları Sihirbazı"
 #: model:ir.model.fields,field_description:delivery_integration_base.field_sale_get_rates_wizard__sale_id
 msgid "Sale Order"
 msgstr "Satış Siparişi"
+
+#. module: delivery_integration_base
+#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__sale_shipping_cost
+msgid "Sale Shipping Cost"
+msgstr "Hesaplanan Kargo Fiyatı"
+
+#. module: delivery_integration_base
+#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__sale_shipping_cost
+msgid "Sale shipping cost no VAT"
+msgstr "KDV'siz kargo fiyatı"
 
 #. module: delivery_integration_base
 #: model:ir.model,name:delivery_integration_base.model_sale_order_line
@@ -519,11 +571,6 @@ msgid "Shipments Total Measured Exit Deci weight"
 msgstr ""
 
 #. module: delivery_integration_base
-#: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__carrier_shipping_cost
-msgid "Shipping Cost"
-msgstr "Taşıma maliyeti"
-
-#. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_stock_picking__shipping_number
 msgid "Shipping Number"
 msgstr "Sevkiyat numarası"
@@ -543,11 +590,6 @@ msgstr "Kargo Takip Numarası"
 #: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_shipping_vat
 msgid "Shipping VAT"
 msgstr "Teslimat KDV"
-
-#. module: delivery_integration_base
-#: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_shipping_cost
-msgid "Shipping cost"
-msgstr "Teslimat bedeli"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,help:delivery_integration_base.field_stock_picking__carrier_shipping_total
@@ -588,6 +630,11 @@ msgstr "Entegrasyonu olmayan kargo için takip URL öneki."
 #: model:ir.model,name:delivery_integration_base.model_stock_picking
 msgid "Transfer"
 msgstr "Teslimat"
+
+#. module: delivery_integration_base
+#: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_stock_picking_dispatched_deliveries_tree
+msgid "True"
+msgstr "Doğru"
 
 #. module: delivery_integration_base
 #: model:ir.model.fields,field_description:delivery_integration_base.field_delivery_carrier__url_shortener_id
@@ -636,3 +683,4 @@ msgstr "ek ağırlık hesaplama yüzdesi"
 #: model_terms:ir.ui.view,arch_db:delivery_integration_base.view_sale_get_rates_wizard
 msgid "or"
 msgstr "ya da"
+

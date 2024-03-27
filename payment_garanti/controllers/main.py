@@ -25,9 +25,17 @@ class GarantiController(http.Controller):
         #     "Garanti payment request received: s2s_create_json_3ds: kwargs=%s",
         #     pprint.pformat(kwargs),
         # )
+        # Get the order
+        order_sudo = (
+            request.env["sale.order"].sudo().browse(int(kwargs.get("order_id")))
+        )
+        if not order_sudo:
+            raise ValidationError(_("Sale order not found"))
+
         acq = (
             request.env["payment.acquirer"]
             .sudo()
+            .with_context(lang=order_sudo.partner_id.lang or "tr_TR")
             .browse(int(kwargs.get("acquirer_id")))
         )
         # Validate the card data
@@ -35,19 +43,12 @@ class GarantiController(http.Controller):
         card_args["card_number"] = kwargs.get("cc_number")
         card_args["card_cvv"] = kwargs.get("cc_cvc")
         card_args["card_name"] = kwargs.get("cc_holder_name")
-        card_args["card_valid_month"] = kwargs.get("cc_expiry")[0:2]
-        card_args["card_valid_year"] = kwargs.get("cc_expiry")[5:]
+        card_args["card_valid_month"] = kwargs.get("cc_expiry_month")
+        card_args["card_valid_year"] = kwargs.get("cc_expiry_year")
 
         card_error = acq._garanti_validate_card_args(card_args)
         if card_error:
             raise ValidationError(card_error)
-
-        # Get the order
-        order_sudo = (
-            request.env["sale.order"].sudo().browse(int(kwargs.get("order_id")))
-        )
-        if not order_sudo:
-            raise ValidationError(_("Sale order not found"))
 
         # Validate the amount
         try:
@@ -70,7 +71,7 @@ class GarantiController(http.Controller):
                     "acquirer_reference": order_sudo.name,
                     "partner_id": order_sudo.partner_id.id,
                     "sale_order_ids": [(4, order_sudo.id, False)],
-                    "currency_id": order_sudo.currency_id.id,
+                    "currency_id": order_sudo.garanti_payment_currency_id.id,
                     "date": datetime.now(),
                     "state": "draft",
                 }
@@ -86,9 +87,7 @@ class GarantiController(http.Controller):
                 tx_sudo, amount, card_args, client_ip
             )
         except Exception as e:
-            _logger.exception("Garanti: error when sending payment request: %s", str(e))
-            tx_sudo._set_transaction_error(e)
-            raise e
+            tx_sudo._set_transaction_error(_("Payment Error. Please contact us."))
         # Save the transaction in the session
         PaymentProcessing.add_payment_transaction(tx_sudo)
         return response_content
@@ -106,12 +105,6 @@ class GarantiController(http.Controller):
         Handle the return from the 3DS authentication.
         notification_data is a dict coming from Garanti.
         """
-        # handle the response
-        # Careful about the log here, it can contain sensitive information
-        _logger.debug(
-            "Garanti 3DS auth return received: return_from_3ds_auth: kwargs=%s",
-            pprint.pformat(kwargs),
-        )
         try:
             tx = (
                 request.env["payment.transaction"]
@@ -120,10 +113,15 @@ class GarantiController(http.Controller):
             )
             if not tx.sale_order_ids:
                 raise ValidationError(_("Transaction not completed"))
-        except:
-            return _(
-                "An error occurred while processing your payment. Please contact us."
-            )
+        except Exception as e:
+            if kwargs.get("orderid"):
+                order = request.env["sale.order"].sudo().search(
+                    [("name", "=", kwargs.get("orderid"))]
+                )
+                if order:
+                    return redirect(order.get_portal_url())
+
+            return _("An error occurred. Please contact the administrator.")
 
         # Redirect the user to the status page
         order = fields.first(tx.sale_order_ids)

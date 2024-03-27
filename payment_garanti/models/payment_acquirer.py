@@ -1,10 +1,17 @@
 # Copyright 2022 Yiğit Budak (https://github.com/yibudak)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import logging
-from odoo import _, fields, models, api
+import psycopg2
+import re
+from odoo import api, fields, models, registry, SUPERUSER_ID, _
 from odoo.exceptions import ValidationError
 from .garanti_connector import GarantiConnector
-from odoo.addons.payment_garanti.const import TEST_URL, PROD_URL, CURRENCY_CODES
+from odoo.addons.payment_garanti.const import (
+    TEST_URL,
+    PROD_URL,
+    PROVISION_URL,
+    CURRENCY_CODES,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -13,6 +20,9 @@ class PaymentAcquirerGaranti(models.Model):
     _inherit = "payment.acquirer"
 
     provider = fields.Selection(selection_add=[("garanti", "Garanti")])
+    debug_logging = fields.Boolean(
+        "Debug logging", help="Log requests in order to ease debugging"
+    )
 
     garanti_merchant_id = fields.Char(
         string="Merchant ID",
@@ -49,6 +59,78 @@ class PaymentAcquirerGaranti(models.Model):
         groups="base.group_user",
     )
 
+    def toggle_debug(self):
+        for c in self:
+            c.debug_logging = not c.debug_logging
+
+    def log_xml(self, xml_string, func):
+        self.ensure_one()
+
+        if self.debug_logging:
+            db_name = self._cr.dbname
+            # Use a new cursor to avoid rollback that could be caused by an upper method
+            try:
+                db_registry = registry(db_name)
+                with db_registry.cursor() as cr:
+                    env = api.Environment(cr, SUPERUSER_ID, {})
+                    IrLogging = env["ir.logging"]
+                    created_log = IrLogging.sudo().create(
+                        {
+                            "name": "payment.acquirer",
+                            "type": "server",
+                            "dbname": db_name,
+                            "level": "DEBUG",
+                            "message": str(xml_string),
+                            "path": self.provider,
+                            "func": func,
+                            "line": 1,
+                        }
+                    )
+                    """
+                    Save the error message to the database, so we can handle
+                    the error message better.
+                    """
+                    error_obj = env["payment.provider.error"].sudo()
+                    error_code = False
+                    error_message = False
+                    sys_error_message = False
+                    # It means that the request has been made by return endpoint
+                    if isinstance(xml_string, dict):
+                        error_code = xml_string.get("mdstatus", False)
+                        error_message = xml_string.get("mderrormessage", False)
+                    else:
+                        reason_code = re.findall(
+                            r"<ReasonCode>(\d+)</ReasonCode>", xml_string
+                        )
+                        xml_msg = re.findall(r"<ErrorMsg>(.*?)</ErrorMsg>", xml_string)
+                        sys_error_msg = re.findall(
+                            r"<SysErrMsg>(.*?)</SysErrMsg>", xml_string
+                        )
+                        if reason_code and xml_msg:
+                            error_code = reason_code[0]
+                            error_message = xml_msg[0]
+                            if sys_error_msg:
+                                sys_error_message = sys_error_msg[0]
+
+                    if (
+                        error_code
+                        and error_message
+                        and not error_obj.search_read(
+                            [("error_message", "=", error_message)], limit=1
+                        )
+                    ):
+                        error_record = error_obj.create(
+                            {
+                                "error_code": error_code,
+                                "sys_error_message": sys_error_message,
+                                "error_message": error_message,
+                                "log_id": created_log.id,
+                            }
+                        )
+                        error_record._onchange_error_message()
+            except psycopg2.Error:
+                pass
+
     @api.model
     def garanti_s2s_form_process(self, data):
         values = {
@@ -59,7 +141,6 @@ class PaymentAcquirerGaranti(models.Model):
             "cc_brand": data.get("cc_brand"),
             "acquirer_id": int(data.get("acquirer_id")),
             "partner_id": int(data.get("partner_id")),
-            "acquirer_ref": "denemedir",  # todo: remove
         }
         payment_method = self.env["payment.token"].sudo().create(values)
         return payment_method
@@ -77,6 +158,14 @@ class PaymentAcquirerGaranti(models.Model):
             return PROD_URL
         else:
             return TEST_URL
+
+    def _garanti_get_prov_url(self):
+        """
+        This method is used to get the provision url
+        :return: The provision url
+        """
+        self.ensure_one()
+        return PROVISION_URL
 
     def _garanti_get_mode(self):
         """
